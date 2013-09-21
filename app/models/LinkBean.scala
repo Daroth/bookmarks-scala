@@ -6,8 +6,8 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-case class Link(id:Pk[Long], link:String)
+case class LinkBean(id:Pk[Long], link:String)
 
-object Link {
+object LinkBean {
 
 }

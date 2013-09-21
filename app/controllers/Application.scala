@@ -18,6 +18,6 @@ object Application extends Controller {
     tuple(
       "mail" -> text,
       "password" -> text) verifying ("Invalid email or password", result => result match {
-        case (mail, password) => User.authenticate(mail, password).isDefined
+        case (mail, password) => UserBean.authenticate(mail, password).isDefined
       }))
 }
