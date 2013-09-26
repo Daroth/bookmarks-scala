@@ -4,6 +4,7 @@
 
 # Home page
 GET    /                         controllers.Bookmarks.index
+GET    /tags                     controllers.Bookmarks.tags
 
 
 # Map static resources from the /public folder to the /assets URL path

@@ -16,7 +16,7 @@ CREATE TABLE `bookmark_tag` (
 );
 
 CREATE TABLE `link` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `link` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `link` (`link`)
@@ -39,7 +39,7 @@ CREATE TABLE `oauth2_info` (
 );
 
 CREATE TABLE `tag` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
