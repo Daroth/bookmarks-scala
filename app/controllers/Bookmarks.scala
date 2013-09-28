@@ -12,7 +12,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.Json._
 
 object Bookmarks extends Controller with securesocial.core.SecureSocial {
-  def index = SecuredAction { implicit request =>
+  def index = Action { implicit request =>
 
     Ok(views.html.index())
   }
@@ -22,4 +22,3 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
     Ok(Json.toJson(tagsList map { tag => Json.obj(tag.name -> tag.weight) }))
   }
 }
-

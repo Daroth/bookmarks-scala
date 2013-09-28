@@ -1,0 +1,12 @@
+@* fluid_two_columns_layout Template File *@
+@(l1: Int, l2:Int)(c1:Html)(c2:Html)
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span@l1">
+			@c1
+		</div>
+		<div class="span@l2">
+			@c2
+		</div>
+	</div>
+</div>

@@ -1,8 +1,16 @@
-@()
+@(param: Any)
 
 @import helper._
+@import bookmarks._
+@import utils.fluid_two_columns_layout
 @import helper.twitterBootstrap._
 
 @main("Bookmarks") {
-	<h1>Your are connected!</h1>    
+	@fluid_two_columns_layout(3, 9) {
+		@link_form()
+	} {
+		@filter()
+		@tags_cloud()
+		@links_list()
+	}
 }

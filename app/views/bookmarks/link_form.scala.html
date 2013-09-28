@@ -1,0 +1,45 @@
+@* link_form Template File *@
+@(param: Any)
+
+<form class="row-fluid">
+   <fieldset>
+      <legend>Add link</legend>
+
+      <div class="control-group">
+         <label class="control-label" for="link">Link</label>
+         <div class="controls">
+            <input id="link" name="link" placeholder="Add a new link" class="input-xlarge" required="" type="text">
+         </div>
+      </div>
+
+      <div class="control-group">
+         <label class="control-label" for="title">Title</label>
+         <div class="controls">
+            <input id="title" name="title" placeholder="" class="input-xlarge" required="" type="text">
+         </div>
+      </div>
+
+      <div class="control-group">
+         <label class="control-label" for="tags">Tags</label>
+         <div class="controls">
+            <input id="tags" name="tags" placeholder="tags1, tags2, ..." class="input-xlarge" required="" type="text">
+            <p class="help-block">Tags are separated by commas</p>
+         </div>
+      </div>
+
+      <div class="control-group">
+         <label class="control-label" for="description">Description</label>
+         <div class="controls">
+            <textarea id="description" name="description"></textarea>
+         </div>
+      </div>
+
+      <div class="control-group">
+         <label class="control-label" for="save-link"></label>
+         <div class="controls">
+            <button id="save-link" name="save-link" class="btn btn-success">Save</button>
+            <button id="reset-link" name="reset-link" class="btn btn-inverse">Reset</button>
+         </div>
+      </div>
+   </fieldset>
+</form>
