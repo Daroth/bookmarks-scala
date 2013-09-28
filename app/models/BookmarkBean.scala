@@ -3,27 +3,59 @@ package models
 import java.util.Date
 import play.api.db._
 import play.api.Play.current
-
 import anorm._
 import anorm.SqlParser._
+import play.api.libs.json.Writes
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 
-case class BookmarkBean(id: Pk[Long], date: Date, description: String, userId: Long, linkId: Long, link:LinkBean)
+case class BookmarkBean(id: Pk[Long], title: String, date: Date, description: String, userId: Long, linkId: Long, link: LinkBean)
 
 object BookmarkBean {
+
+  implicit val bookmarkWrites = new Writes[BookmarkBean] {
+    def writes(c: BookmarkBean): JsValue = {
+
+      def n = c.id match {
+        case Id(refererId) => refererId.toString
+        case _ => ""
+      }
+      Json.obj(
+        "id" -> n,
+        "link" -> c.link.link,
+        "title" -> c.title,
+        "description" -> c.description,
+        "date" -> c.date)
+    }
+  }
   val simple = {
     get[Pk[Long]]("bookmark.id") ~
+      get[String]("bookmark.title") ~
       get[Date]("bookmark.date") ~
       get[String]("bookmark.description") ~
       get[Long]("bookmark.user_id") ~
       get[Long]("bookmark.link_id") ~
       get[String]("link.link") map {
-        case id ~ date ~ description ~ userId ~ linkId ~ link => BookmarkBean(id, date, description, userId, linkId, LinkBean(Id(linkId), link))
+        case id ~ title ~ date ~ description ~ userId ~ linkId ~ link => BookmarkBean(id, title, date, description, userId, linkId, LinkBean(Id(linkId), link))
       }
   }
 
   def findById(id: Long): Option[BookmarkBean] = {
     DB.withConnection { implicit connection =>
-      SQL("select bookmark.`id`, bookmark.`date`, bookmark.`description`, bookmark.`user_id`, bookmark.`link_id`, link.link from bookmark inner join link in link.id = bookmark.link_id where id = {id}").on('id -> id).as(BookmarkBean.simple.singleOpt)
+      SQL("select bookmark.`id`, bookmark.title, bookmark.`date`, bookmark.`description`, bookmark.`user_id`, bookmark.`link_id`, link.link from bookmark inner join link in link.id = bookmark.link_id where id = {id}").on('id -> id).as(BookmarkBean.simple.singleOpt)
+    }
+  }
+
+  def findForUser(userId: String, providerId: String): Seq[BookmarkBean] = {
+    DB.withConnection { implicit connection =>
+      SQL("""
+    		SELECT bookmark.id, bookmark.title, bookmark.date, bookmark.description, bookmark.user_id, bookmark.link_id, link.link
+			FROM bookmark
+    		INNER JOIN link ON bookmark.link_id = link.id
+			INNER JOIN user ON bookmark.user_id = user.id
+			WHERE user.user_id = {userId}
+			AND user.provider_id = {providerId}
+          """).on('userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple *)
     }
   }
 }

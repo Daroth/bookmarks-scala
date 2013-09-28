@@ -1,5 +1,12 @@
 @* links_list Template File *@
 @(param: Any)
 <div class="well">
-
+{{#each}}
+<div class="bookmark">
+	<h1><a href="{{link}}">{{title}}</a></h1>
+	<i>{{date}}</i>
+	<div>{{description}}</div>
+	<strong>{{tags}}</strong>
+</div>
+{{/each}}
 </div>

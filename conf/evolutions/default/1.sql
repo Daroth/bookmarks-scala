@@ -1,5 +1,6 @@
 CREATE TABLE `bookmark` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR( 255 ) NULL,
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `description` text NOT NULL,
   `user_id` int(11) NOT NULL,
