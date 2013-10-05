@@ -8,6 +8,7 @@ import anorm.SqlParser._
 import play.api.libs.json.Writes
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
+import securesocial.core.Identity
 
 case class BookmarkBean(id: Pk[Long], title: String, date: Date, description: String, userId: Long, linkId: Long, link: LinkBean)
 
@@ -56,6 +57,25 @@ object BookmarkBean {
 			WHERE user.user_id = {userId}
 			AND user.provider_id = {providerId}
           """).on('userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple *)
+    }
+  }
+
+  def save(link: String, title: String, tags: String, description: String, identity: Identity) {
+    val user = UserBean.findByIdentity(identity)
+    user match {
+      case Some(x) => {
+        val linkBean = LinkBean.createOrRetrieve(link)
+
+        DB.withConnection { implicit connection =>
+          SQL("""
+        INSERT INTO bookmark (`title`, `description`, `user_id`, `link_id`)
+        VALUES ({title}, {description}, {user_id}, {link_id})
+        """)
+            .on('title -> title, 'description -> description, 'user_id -> x.id, 'link_id -> linkBean.id)
+            .executeInsert()
+        }
+      }
+      case _ => throw new NoSuchElementException
     }
   }
 }

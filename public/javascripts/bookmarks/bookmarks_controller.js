@@ -1,3 +1,16 @@
+var TagsParser = (function() {
+	
+	var parse;
+	
+	parse = function(raw_text) {
+		return raw_text.split(/\s*,\s*/i)
+	}
+	
+	return {
+		parse: parse
+	};
+})();
+
 Bookmarks.BookmarksController = Ember.ArrayController.extend({
 	actions : {
 		create : function() {
@@ -6,21 +19,23 @@ Bookmarks.BookmarksController = Ember.ArrayController.extend({
 			var title = this.get('title');
 			var tags = this.get('tags');
 			var description = this.get('description');
-			if (!title.trim()) {
-				return;
-			}
-
-			// Create the new Todo model
+			var that = this;
+			
+			
+						// Create the new Todo model
 			var bookmark = this.store.createRecord('bookmark', {
 				link : link,
 				title : title,
-				tags : tags,
 				description : description
 			});
+			
+			
+			TagsParser.parse(tags).forEach(function(e) {
+				var tag = that.store.createRecord('tag', {"name": e});
+				bookmark.get('tags').addObject(tag)
+			})
 
-			// Clear the "New Todo" text field
-			this.set('newTitle', '');
-
+			// reset
 			this.set('link', '');
 			this.set('title', '');
 			this.set('tags', '');

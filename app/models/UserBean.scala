@@ -137,6 +137,13 @@ object UserBean {
     }
   }
 
+  def findByIdentity(user: Identity): Option[UserBean] = {
+    DB.withConnection { implicit connection =>
+      SQL("select * from user WHERE user_id = {userId} and provider_id = {providerId}").on(
+        'userId -> user.identityId.userId, 'providerId -> user.identityId.providerId).as(UserBean.simple.singleOpt)
+    }
+  }
+
   def authenticate(email: String, password: String): Option[UserBean] = {
     DB.withConnection { implicit connection =>
       SQL("""

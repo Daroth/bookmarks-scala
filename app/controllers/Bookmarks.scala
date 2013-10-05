@@ -13,14 +13,15 @@ import play.api.libs.json.Json._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import views.html.defaultpages.badRequest
+import java.util.Date
 
 object Bookmarks extends Controller with securesocial.core.SecureSocial {
 
-  implicit val bookmark = (
+  implicit val bookmark = (__ \ "bookmark").read(
     (__ \ 'link).read[String] and
-    (__ \ 'title).read[String] and
-    (__ \ 'tags).read[String] and
-    (__ \ 'description).read[String]) tupled
+      (__ \ 'title).read[String] and
+      (__ \ 'tags).read[String] and
+      (__ \ 'description).read[String] tupled)
 
   def index = SecuredAction { implicit request =>
 
@@ -41,6 +42,21 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
     request.body.asJson.map { json =>
       json.validate[(String, String, String, String)].map {
         case (link, title, tags, description) => Ok(Json.obj("status" -> "OK"))
+      }.recoverTotal {
+        e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
+      }
+    }.getOrElse {
+      BadRequest("Expecting Json data")
+    }
+  }
+
+  def saveBookmark = SecuredAction { request =>
+    request.body.asJson.map { json =>
+      json.validate[(String, String, String, String)].map {
+        case (link, title, tags, description) => {
+          BookmarkBean.save(link, title, tags, description, request.user)
+          Ok(Json.obj("status" -> "OK"))
+        }
       }.recoverTotal {
         e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
       }

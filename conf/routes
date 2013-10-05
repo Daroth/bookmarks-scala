@@ -5,8 +5,11 @@
 # Home page
 GET    /                         controllers.Bookmarks.index
 GET    /tags                     controllers.Bookmarks.tags
-POST   /validate/bookmark        controllers.Bookmarks.validateBookmark
 GET    /bookmarks                controllers.Bookmarks.getBookmarks
+POST   /bookmarks                controllers.Bookmarks.saveBookmark
+
+# not used yet
+POST   /validate/bookmark        controllers.Bookmarks.validateBookmark
 
 
 # Map static resources from the /public folder to the /assets URL path
