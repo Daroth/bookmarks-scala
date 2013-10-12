@@ -34,8 +34,8 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
   }
 
   def getBookmarks = SecuredAction { request =>
-    var bookmarksList = BookmarkBean.findForUser(request.user.identityId.userId, request.user.identityId.providerId)
-    Ok(Json.obj("bookmarks" -> Json.toJson(bookmarksList)))
+    var bookmarksList = BookmarkBeanWithTags.findForUser(request.user.identityId.userId, request.user.identityId.providerId)
+    Ok(Json.obj("bookmarks" -> Json.toJson(List[BookmarkBeanWithTags]())))
   }
 
   def validateBookmark = SecuredAction { request =>

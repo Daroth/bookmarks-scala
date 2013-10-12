@@ -15,18 +15,40 @@ import securesocial.core.OAuth2Info
 import securesocial.core.PasswordInfo
 import securesocial.core.OAuth1Info
 import securesocial.core.OAuth1Info
+import play.api.libs.json.Writes
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 
 case class TagBean(id: Pk[Long], name: String)
 case class TagWeightBean(name: String, weight: Long)
 
 object TagBean {
 
+  implicit val tagWrites = new Writes[TagBean] {
+    def writes(c: TagBean): JsValue = {
+
+      def n = c.id match {
+        case Id(refererId) => refererId.toString
+        case _ => ""
+      }
+      Json.obj(
+        "id" -> n,
+        "name" -> c.name)
+    }
+  }
+
   val simpleWeighted = {
     get[String]("tag.name") ~
       get[Long]("weight") map {
         case name ~ weight => TagWeightBean(name, weight)
       }
+  }
 
+  val simple = {
+    get[Pk[Long]]("tag.id") ~
+      get[String]("tag.name") map {
+        case id ~ name => TagBean(id, name)
+      }
   }
 
   def findForUser(userId: String, providerId: String): Seq[TagWeightBean] = {
@@ -41,6 +63,17 @@ object TagBean {
 			AND user.provider_id = {providerId}
 			GROUP BY tag.name
           """).on('userId -> userId, 'providerId -> providerId).as(TagBean.simpleWeighted *)
+    }
+  }
+
+  def findByBookmarkId(bookmarkId: Pk[Long]): List[TagBean] = {
+    DB.withConnection { implicit connection =>
+      SQL("""
+    		SELECT tag.id, tag.name
+			FROM tag
+			INNER JOIN bookmark_tag ON tag.id = bookmark_tag.tag_id
+			WHERE bookmark_tag.bookmark_id = {bookmarkId}
+          """).on('bookmarkId -> bookmarkId).as(TagBean.simple *)
     }
   }
 }
