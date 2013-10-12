@@ -29,13 +29,14 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
   }
 
   def tags = SecuredAction { request =>
-    val tagsList = TagBean.findForUser(request.user.identityId.userId, request.user.identityId.providerId)
+    val tagsList = TagBean.findForUser(request.user.id.id, request.user.id.providerId)
     Ok(Json.toJson(tagsList map { tag => Json.obj(tag.name -> tag.weight) }))
   }
 
   def getBookmarks = SecuredAction { request =>
-    var bookmarksList = BookmarkBeanWithTags.findForUser(request.user.identityId.userId, request.user.identityId.providerId)
-    Ok(Json.obj("bookmarks" -> Json.toJson(List[BookmarkBeanWithTags]())))
+    var bookmarksList = BookmarkBeanWithTags.findForUser(request.user.id.id, request.user.id.providerId)
+    var tagsList = TagBean.findDistinctForUser(request.user.id.id, request.user.id.providerId)
+    Ok(Json.obj("bookmarks" -> Json.toJson(bookmarksList), "tags" -> Json.toJson(tagsList)))
   }
 
   def validateBookmark = SecuredAction { request =>

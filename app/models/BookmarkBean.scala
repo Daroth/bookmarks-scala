@@ -4,6 +4,7 @@ import java.util.Date
 import play.api.db._
 import play.api.Play.current
 import anorm._
+import anorm.Id
 import anorm.SqlParser._
 import play.api.libs.json.Writes
 import play.api.libs.json.JsValue
@@ -21,29 +22,37 @@ object BookmarkBeanWithTags {
         case Id(refererId) => refererId.toString
         case _ => ""
       }
+
+      def ids: List[String] = c.tags map {
+        x =>
+          x.id match {
+            case Id(y) => y.toString
+            case _ => ""
+          }
+      }
+
       Json.obj(
         "id" -> n,
         "link" -> c.link.link,
         "title" -> c.title,
         "description" -> c.description,
         "date" -> c.date,
-        "tags" -> Json.arr(c.tags))
+        "tags" -> ids)
     }
   }
 
   def findForUser(userId: String, providerId: String): List[BookmarkBeanWithTags] = {
     DB.withConnection { implicit connection =>
-      var x = SQL("""
+      SQL("""
     		SELECT bookmark.id, bookmark.title, bookmark.date, bookmark.description, bookmark.user_id, bookmark.link_id, link.link
 			FROM bookmark
     		INNER JOIN link ON bookmark.link_id = link.id
 			INNER JOIN user ON bookmark.user_id = user.id
 			WHERE user.user_id = {userId}
 			AND user.provider_id = {providerId}
-          """).on('userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple *)
-          
-        x.map { b => BookmarkBeanWithTags(b.id, b.title, b.date, b.description, b.userId, b.linkId, b.link, TagBean.findByBookmarkId(b.id)) }
-
+          """).on('userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple *).map { b =>
+        BookmarkBeanWithTags(b.id, b.title, b.date, b.description, b.userId, b.linkId, b.link, TagBean.findByBookmarkId(b.id))
+      }
     }
   }
 

@@ -10,13 +10,12 @@ import securesocial.core.SocialUser
 import securesocial.core.PasswordInfo
 import securesocial.core.AuthenticationMethod
 import securesocial.core.OAuth1Info
-import securesocial.core.IdentityId
 import securesocial.core.OAuth2Info
 import securesocial.core.PasswordInfo
 import securesocial.core.OAuth1Info
 import securesocial.core.OAuth1Info
 
-case class UserBean(id: Pk[Long], identityId: IdentityId, firstName: String, lastName: String, fullName: String, email: Option[String],
+case class UserBean(idPk: Pk[Long], id: UserId, firstName: String, lastName: String, fullName: String, email: Option[String],
   avatarUrl: Option[String], authMethod: AuthenticationMethod,
   oAuth1Info: Option[OAuth1Info] = None,
   oAuth2Info: Option[OAuth2Info] = None,
@@ -59,7 +58,7 @@ object UserBean {
             }
             case _ => None
           }
-          UserBean(id, IdentityId(userId, providerId), firstName, lastName, fullName, email, avatarUrl, aAuthMethod, oauth1, oauth2, Some(PasswordInfo(hasher, password, salt)))
+          UserBean(id, UserId(userId, providerId), firstName, lastName, fullName, email, avatarUrl, aAuthMethod, oauth1, oauth2, Some(PasswordInfo(hasher, password, salt)))
         }
       }
   }
@@ -79,7 +78,7 @@ object UserBean {
     }
 
     DB.withConnection { implicit connection =>
-      val userById = findByUserId(user.identityId.userId)
+      val userById = findByUserId(user.id.id)
       userById match {
         case Some(_) =>
           SQL("""
@@ -87,15 +86,15 @@ object UserBean {
         		email={email}, avatar_url={avatar_url}, auth_method={auth_method}, hasher={hasher}, password={password}, salt={salt}
             WHERE user_id={user_id}
             """)
-            .on('user_id -> user.identityId.userId, 'provider_id -> user.identityId.providerId, 'first_name -> user.firstName, 'last_name -> user.lastName, 'full_name -> user.fullName, 'email -> user.email, 'avatar_url -> user.avatarUrl, 'auth_method -> user.authMethod.method, 'hasher -> hasher, 'password -> password, 'salt -> salt)
+            .on('user_id -> user.id.id, 'provider_id -> user.id.providerId, 'first_name -> user.firstName, 'last_name -> user.lastName, 'full_name -> user.fullName, 'email -> user.email, 'avatar_url -> user.avatarUrl, 'auth_method -> user.authMethod.method, 'hasher -> hasher, 'password -> password, 'salt -> salt)
             .executeUpdate()
-          findByUserId(user.identityId.userId) match { case Some(x) => x }
+          findByUserId(user.id.id) match { case Some(x) => x }
         case _ =>
           val id = SQL("""
         		INSERT INTO user(user_id, provider_id, first_name, last_name, full_name, email, avatar_url, auth_method, hasher, password, salt) VALUES
         		({user_id}, {provider_id}, {first_name}, {last_name}, {full_name}, {email}, {avatar_url}, {auth_method}, {hasher}, {password}, {salt})
         		""")
-            .on('user_id -> user.identityId.userId, 'provider_id -> user.identityId.providerId, 'first_name -> user.firstName, 'last_name -> user.lastName, 'full_name -> user.fullName, 'email -> user.email, 'avatar_url -> user.avatarUrl, 'auth_method -> user.authMethod.method, 'hasher -> hasher, 'password -> password, 'salt -> salt)
+            .on('user_id -> user.id.id, 'provider_id -> user.id.providerId, 'first_name -> user.firstName, 'last_name -> user.lastName, 'full_name -> user.fullName, 'email -> user.email, 'avatar_url -> user.avatarUrl, 'auth_method -> user.authMethod.method, 'hasher -> hasher, 'password -> password, 'salt -> salt)
             .executeInsert()
           id match {
             case Some(x) => UserBean.findById(x) match { case Some(x) => x }
@@ -140,7 +139,7 @@ object UserBean {
   def findByIdentity(user: Identity): Option[UserBean] = {
     DB.withConnection { implicit connection =>
       SQL("select * from user WHERE user_id = {userId} and provider_id = {providerId}").on(
-        'userId -> user.identityId.userId, 'providerId -> user.identityId.providerId).as(UserBean.simple.singleOpt)
+        'userId -> user.id.id, 'providerId -> user.id.providerId).as(UserBean.simple.singleOpt)
     }
   }
 

@@ -3,7 +3,6 @@ package service
 import play.api.{ Logger, Application }
 import securesocial.core._
 import securesocial.core.providers.Token
-import securesocial.core.IdentityId
 import models.UserBean
 import models.TokenBean
 
@@ -14,8 +13,8 @@ class UserService(application: Application) extends UserServicePlugin(applicatio
    * @param id the user id
    * @return an optional user
    */
-  def find(id: IdentityId): Option[Identity] =
-    UserBean.findByUserId(id.userId)
+  def find(id: UserId): Option[Identity] =
+    UserBean.findByUserId(id.id)
 
   /**
    * Finds a user by email and provider id.

@@ -10,7 +10,6 @@ import securesocial.core.SocialUser
 import securesocial.core.PasswordInfo
 import securesocial.core.AuthenticationMethod
 import securesocial.core.OAuth1Info
-import securesocial.core.IdentityId
 import securesocial.core.OAuth2Info
 import securesocial.core.PasswordInfo
 import securesocial.core.OAuth1Info
@@ -74,6 +73,20 @@ object TagBean {
 			INNER JOIN bookmark_tag ON tag.id = bookmark_tag.tag_id
 			WHERE bookmark_tag.bookmark_id = {bookmarkId}
           """).on('bookmarkId -> bookmarkId).as(TagBean.simple *)
+    }
+  }
+  
+  def findDistinctForUser(userId: String, providerId: String): List[TagBean] = {
+    DB.withConnection { implicit connection =>
+      SQL("""
+    		SELECT DISTINCT tag.id, tag.name
+			FROM tag
+            INNER JOIN bookmark_tag ON tag.id = bookmark_tag.tag_id
+            INNER JOIN bookmark ON bookmark.id = bookmark_tag.bookmark_id
+			INNER JOIN user ON bookmark.user_id = user.id
+			WHERE user.user_id = {userId}
+			AND user.provider_id = {providerId}
+          """).on('userId -> userId, 'providerId -> providerId).as(TagBean.simple *)
     }
   }
 }

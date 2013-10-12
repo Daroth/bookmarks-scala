@@ -6,7 +6,9 @@
 	<h1><a href="{{link}}">{{title}}</a></h1>
 	<i>{{dateFormat date}}</i>
 	<div>{{description}}</div>
-	<strong>{{tags}}</strong>
+	<strong>
+		{{#each tags}}<span class="tag">{{name}}</span>{{/each}}
+	</strong>
 </div>
 {{/each}}
 </div>
