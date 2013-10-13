@@ -6,6 +6,7 @@ CREATE TABLE `bookmark` (
   `user_id` int(11) NOT NULL,
   `link_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `u_link_user_bookmark` (`user_id`,`link_id`),
   KEY `user_id` (`user_id`),
   KEY `link_id` (`link_id`)
 );

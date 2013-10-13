@@ -17,11 +17,11 @@ import java.util.Date
 
 object Bookmarks extends Controller with securesocial.core.SecureSocial {
 
-  implicit val bookmark = (__ \ "bookmark").read(
+  implicit val bookmark =
     (__ \ 'link).read[String] and
       (__ \ 'title).read[String] and
-      (__ \ 'tags).read[String] and
-      (__ \ 'description).read[String] tupled)
+      (__ \ 'tags).read[List[String]] and
+      (__ \ 'description).read[Option[String]] tupled
 
   private def userId = "a@a.a" // request.user.id.id
   private def providerId = "userpass" // request.user.id.providerId
@@ -54,18 +54,22 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
     Ok(Json.toJson(bookmarksList))
   }
 
-  //  def saveBookmark = Action { request =>
-  //    request.body.asJson.map { json =>
-  //      json.validate[(String, String, String, String)].map {
-  //        case (link, title, tags, description) => {
-  //          BookmarkBean.save(link, title, tags, description, request.user)
-  //          Ok(Json.obj("status" -> "OK"))
-  //        }
-  //      }.recoverTotal {
-  //        e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
-  //      }
-  //    }.getOrElse {
-  //      BadRequest("Expecting Json data")
-  //    }
-  //  }
+  def saveBookmark = Action { request =>
+    request.body.asJson.map { json =>
+      json.validate[(String, String, List[String], Option[String])].map {
+        case (link, title, tags, description) => {
+          val desc = description match {
+            case Some(t) => t
+            case _ => ""
+          }
+          BookmarkBean.save(link, title, tags, desc, userId, providerId)
+          Ok(Json.obj("status" -> "OK"))
+        }
+      }.recoverTotal {
+        e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
+      }
+    }.getOrElse {
+      BadRequest("Expecting Json data")
+    }
+  }
 }

@@ -6,7 +6,23 @@ var bookmarksControllers = angular.module('bookmarksControllers',
 bookmarksControllers.controller('BookmarksCtrl', [ '$scope', 'Bookmark', 'Tag',
 		function BookmarksCtrl($scope, Bookmark, Tag) {
 			$scope.bookmarks = Bookmark.all();
+
 			$scope.tags = Tag.all();
+
+			$scope.resetCreationForm = function() {
+				$scope.newBookmark = undefined;
+			}
+			$scope.saveCreationForm = function() {
+				var bookmark = {
+					title : $scope.newBookmark.title,
+					description : $scope.newBookmark.description,
+					link : $scope.newBookmark.link,
+					tags : (function parseTags(tags) {
+						return tags.split(/\s*,\s*/);
+					})($scope.newBookmark.tags)
+				}
+				Bookmark.create(bookmark);
+			}
 		} ]);
 
 bookmarksControllers.controller('BookmarkEditCtrl', [ '$scope', '$routeParams',

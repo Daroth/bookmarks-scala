@@ -101,19 +101,39 @@ object BookmarkBean {
     }
   }
 
-  def save(link: String, title: String, tags: String, description: String, identity: Identity) {
-    val user = UserBean.findByIdentity(identity)
+  def findByUserAndLink(userId: Long, linkId: Long): Option[BookmarkBean] = {
+    DB.withConnection { implicit connection =>
+      SQL("""
+		  SELECT bookmark.`id`, bookmark.title, bookmark.`date`, bookmark.`description`, bookmark.`user_id`, bookmark.`link_id`, link.link
+			FROM bookmark
+			INNER JOIN link ON link.id = bookmark.link_id
+			WHERE bookmark.user_id = {userId}
+			AND bookmark.link_id = {linkId}
+		  """).on('userId -> userId, 'linkId -> linkId).as(BookmarkBean.simple.singleOpt)
+    }
+  }
+
+  def save(link: String, title: String, tags: List[String], description: String, userId: String, providerId: String) {
+    val user = UserBean.findByIdentity(userId, providerId)
     user match {
       case Some(x) => {
         val linkBean = LinkBean.createOrRetrieve(link)
-
-        DB.withConnection { implicit connection =>
-          SQL("""
-        INSERT INTO bookmark (`title`, `description`, `user_id`, `link_id`)
-        VALUES ({title}, {description}, {user_id}, {link_id})
-        """)
-            .on('title -> title, 'description -> description, 'user_id -> x.id, 'link_id -> linkBean.id)
-            .executeInsert()
+        val idBookmark = x.idPk match { case Id(u) => u }
+        val idLink = linkBean.id match { case Id(u) => u }
+        val bookmarkExists = findByUserAndLink(idBookmark, idLink)
+        bookmarkExists match {
+          case Some(bbb) => bbb
+          case _ => {
+            var bookmarkId = DB.withConnection { implicit connection =>
+              SQL("""
+			        INSERT INTO bookmark (`title`, `description`, `user_id`, `link_id`)
+			        VALUES ({title}, {description}, {user_id}, {link_id})
+			        """)
+                .on('title -> title, 'description -> description, 'user_id -> x.idPk, 'link_id -> linkBean.id)
+                .executeInsert()
+            }
+            bookmarkId match { case Some(x) => tags map { tag => TagBean.createAndLinkToBookmark(tag, x) } }
+          }
         }
       }
       case _ => throw new NoSuchElementException

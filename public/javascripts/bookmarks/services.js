@@ -11,6 +11,9 @@ bookmarksServices.factory('Bookmark', [ '$resource', function($resource) {
 			params : {
 				bookmarkId : ""
 			}
+		},
+		create : {
+			method : 'POST'
 		}
 	});
 } ]);

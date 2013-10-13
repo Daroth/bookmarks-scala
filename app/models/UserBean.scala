@@ -136,10 +136,12 @@ object UserBean {
     }
   }
 
-  def findByIdentity(user: Identity): Option[UserBean] = {
+  def findByIdentity(user: Identity): Option[UserBean] = findByIdentity(user.id.id, user.id.providerId)
+
+  def findByIdentity(userId: String, providerId: String): Option[UserBean] = {
     DB.withConnection { implicit connection =>
       SQL("select * from user WHERE user_id = {userId} and provider_id = {providerId}").on(
-        'userId -> user.id.id, 'providerId -> user.id.providerId).as(UserBean.simple.singleOpt)
+        'userId -> userId, 'providerId -> providerId).as(UserBean.simple.singleOpt)
     }
   }
 

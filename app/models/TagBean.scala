@@ -42,7 +42,8 @@ object TagWeightBean {
     def maxCount = tags.maxBy(weight).weight
     def minCount = tags.minBy(weight).weight
     tags map { tag =>
-      def multiplier = (maxPercent - minPercent) / (maxCount - minCount)
+      def diviser = if (maxCount - minCount != 0) maxCount - minCount else maxCount - minCount + 1
+      def multiplier = (maxPercent - minPercent) / diviser
       def weight = minPercent + ((maxCount - (maxCount - (tag.weight - minCount))) * multiplier)
       TagWeightBean(tag.name, weight)
     }
@@ -108,5 +109,41 @@ object TagBean {
 			AND user.provider_id = {providerId}
           """).on('userId -> userId, 'providerId -> providerId).as(TagBean.simple *)
     }
+  }
+
+  private def findTagByName(name: String): Option[TagBean] = {
+    DB.withConnection { implicit connection =>
+      SQL("""
+			  SELECT tag.id, tag.name
+			  FROM tag
+			  WHERE tag.name = {name}
+			  """).on('name -> name).as(TagBean.simple.singleOpt)
+    }
+  }
+
+  private def create(name: String): Long = {
+    DB.withConnection { implicit connection =>
+      val id = SQL("INSERT INTO tag(name) VALUES ({name})")
+        .on('name -> name)
+        .executeInsert()
+      id match { case Some(x) => x }
+    }
+  }
+
+  private def linkToBookmark(tagId: Long, bookmarkId: Long) = {
+    DB.withConnection { implicit connection =>
+      val id = SQL("INSERT INTO bookmark_tag(bookmark_id, tag_id) VALUES ({bookmarkId}, {tagId})")
+        .on('bookmarkId -> bookmarkId, 'tagId -> tagId)
+        .executeInsert()
+    }
+  }
+
+  def createAndLinkToBookmark(tag: String, bookmarkId: Long) = {
+    var tagBean = findTagByName(tag)
+    val tagId = tagBean match {
+      case Some(tagExists) => tagExists.id match { case Id(id) => id }
+      case _ => create(tag)
+    }
+    linkToBookmark(tagId, bookmarkId)
   }
 }

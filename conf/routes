@@ -10,7 +10,7 @@ GET    /partials/bookmark-edit    controllers.Bookmarks.bookmarksEdit
 GET    /tags                      controllers.Bookmarks.tags
 GET    /bookmarks                 controllers.Bookmarks.getBookmarks
 GET    /bookmarks/:bookmarkId     controllers.Bookmarks.getBookmark(bookmarkId: Long)
-# POST   /bookmarks                controllers.Bookmarks.saveBookmark
+POST   /bookmarks                 controllers.Bookmarks.saveBookmark
 
 
 # Map static resources from the /public folder to the /assets URL path
