@@ -1,7 +1,7 @@
 'use strict'; 
 
 var bookmarksApp = angular.module('BookmarksApp', [ 'ngRoute',
-		'bookmarksControllers' ]);
+		'bookmarksControllers', 'bookmarksServices' ]);
 
 bookmarksApp.config([ '$routeProvider', function($routeProvider) {
 	$routeProvider.when('/bookmarks', {

@@ -35,21 +35,36 @@ object TagWeightBean {
     }
   }
 
-  def findForUser(userId: String, providerId: String): List[TagWeightBean] = {
-    DB.withConnection { implicit connection =>
-      SQL("""
-					SELECT tag.name, count( * ) AS weight
-					FROM tag
-					INNER JOIN bookmark_tag ON tag.id = bookmark_tag.tag_id
-					INNER JOIN bookmark ON bookmark.id = bookmark_tag.bookmark_id
-					INNER JOIN user ON bookmark.user_id = user.id
-					WHERE user.user_id = {userId}
-					AND user.provider_id = {providerId}
-					GROUP BY tag.name
-					""").on('userId -> userId, 'providerId -> providerId).as(TagWeightBean.simpleWeighted *)
+  private def calculateSizes(tags: List[TagWeightBean]): List[TagWeightBean] = {
+    val maxPercent = 125;
+    val minPercent = 75;
+    def weight(tag: TagWeightBean) = tag.weight
+    def maxCount = tags.maxBy(weight).weight
+    def minCount = tags.minBy(weight).weight
+    tags map { tag =>
+      def multiplier = (maxPercent - minPercent) / (maxCount - minCount)
+      def weight = minPercent + ((maxCount - (maxCount - (tag.weight - minCount))) * multiplier)
+      TagWeightBean(tag.name, weight)
     }
   }
+
+  def findForUser(userId: String, providerId: String): List[TagWeightBean] = {
+    var x = DB.withConnection { implicit connection =>
+      SQL("""
+			SELECT tag.name, count( * ) AS weight
+			FROM tag
+			INNER JOIN bookmark_tag ON tag.id = bookmark_tag.tag_id
+			INNER JOIN bookmark ON bookmark.id = bookmark_tag.bookmark_id
+			INNER JOIN user ON bookmark.user_id = user.id
+			WHERE user.user_id = {userId}
+			AND user.provider_id = {providerId}
+			GROUP BY tag.name
+			""").on('userId -> userId, 'providerId -> providerId).as(TagWeightBean.simpleWeighted *)
+    }
+    calculateSizes(x)
+  }
 }
+
 object TagBean {
 
   implicit val tagWrites = new Writes[TagBean] {

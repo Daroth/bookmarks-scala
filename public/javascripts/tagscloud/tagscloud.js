@@ -19,12 +19,11 @@ window.TagsCloud = (function() {
 	 *            list of tags [{"name": String, "weight": Int}]
 	 */
 	process = function(tags) {
-		var countArray, maxCount, minCount, weight;
+		var maxCount, minCount, weight;
 
 		weight = function(tag) {
 			return tag.weight;
 		};
-		countArray = _.map(tags, weight);
 		maxCount = _.max(tags, weight).weight;
 		minCount = _.min(tags, weight).weight;
 
