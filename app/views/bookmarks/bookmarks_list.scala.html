@@ -1,0 +1,13 @@
+@* bookmarks_list Template File *@
+@(param: Any)
+
+@import bookmarks._
+@import utils.fluid_two_columns_layout
+
+@fluid_two_columns_layout(3, 9) {
+	@link_form()
+} {
+	@filter()
+	@tags_cloud()
+	@links_list()
+}

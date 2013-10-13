@@ -8,21 +8,24 @@
       <div class="control-group">
          <label class="control-label" for="link">Link</label>
          <div class="controls">
-            {{input type="text" id="link" placeholder="Add a new link" value=link class="input-xlarge" }}
+            @*{{input type="text" id="link" placeholder="Add a new link" value=link class="input-xlarge" }}*@
+            <input ng-model="link" type="text" class="input-xlarge">
          </div>
       </div>
 
       <div class="control-group">
          <label class="control-label" for="title">Title</label>
          <div class="controls">
-            {{input type="text" id="title" value=title class="input-xlarge" }}
+            @*{{input type="text" id="title" value=title class="input-xlarge" }}*@
+            <input ng-model="title" type="text" class="input-xlarge">
          </div>
       </div>
 
       <div class="control-group">
          <label class="control-label" for="tags">Tags</label>
          <div class="controls">
-            {{input type="text" id="tags" placeholder="tags1, tags2, ..." value=tags class="input-xlarge" }}
+            @*{{input type="text" id="tags" placeholder="tags1, tags2, ..." value=tags class="input-xlarge" }}*@
+            <input ng-model="tags" type="text" class="input-xlarge">
             <p class="help-block">Tags are separated by commas</p>
          </div>
       </div>
@@ -30,10 +33,12 @@
       <div class="control-group">
          <label class="control-label" for="description">Description</label>
          <div class="controls">
-            {{textarea id="description" value=description }}
+            @*{{textarea id="description" value=description }}*@
+            <textarea ng-model="description"></textarea>
          </div>
       </div>
 
+	@*
       <div class="control-group">
          <label class="control-label" for="save-link"></label>
          <div class="controls">
@@ -41,5 +46,6 @@
             <button id="reset-link" name="reset-link" class="btn btn-inverse">Reset</button>
          </div>
       </div>
+      *@
    </fieldset>
 </form>

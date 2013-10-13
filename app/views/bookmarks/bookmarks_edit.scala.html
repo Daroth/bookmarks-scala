@@ -1,0 +1,44 @@
+@* bookmarks_list Template File *@
+@(param: Any)
+
+@import bookmarks._
+@import utils.fluid_two_columns_layout
+
+@fluid_two_columns_layout(3, 9) {
+	@link_form()
+} {
+	<form class="row-fluid">
+		<fieldset>
+      		<legend>Edit link</legend>
+
+      		<div class="control-group">
+         		<label class="control-label" for="link">Link</label>
+         		<div class="controls">
+            		<input ng-model="link" type="text" class="input-xlarge">
+         		</div>
+      		</div>
+
+			<div class="control-group">
+         		<label class="control-label" for="title">Title</label>
+         		<div class="controls">
+            		<input ng-model="title" type="text" class="input-xlarge">
+         		</div>
+      		</div>
+
+      		<div class="control-group">
+         		<label class="control-label" for="tags">Tags</label>
+         		<div class="controls">
+            		<input ng-model="tags" type="text" class="input-xlarge">
+            		<p class="help-block">Tags are separated by commas</p>
+         		</div>
+      		</div>
+
+      		<div class="control-group">
+         		<label class="control-label" for="description">Description</label>
+         		<div class="controls">
+            		<textarea ng-model="description"></textarea>
+         		</div>
+      		</div>
+   		</fieldset>
+	</form>
+}

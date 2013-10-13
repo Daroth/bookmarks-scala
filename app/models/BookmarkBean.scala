@@ -23,23 +23,17 @@ object BookmarkBeanWithTags {
         case _ => ""
       }
 
-      def ids: List[String] = c.tags map {
-        x =>
-          x.id match {
-            case Id(y) => y.toString
-            case _ => ""
-          }
-      }
-
       Json.obj(
         "id" -> n,
         "link" -> c.link.link,
         "title" -> c.title,
         "description" -> c.description,
         "date" -> c.date,
-        "tags" -> ids)
+        "tags" -> c.tags)
     }
   }
+
+  private def addTagsToBookmark(b: BookmarkBean) = BookmarkBeanWithTags(b.id, b.title, b.date, b.description, b.userId, b.linkId, b.link, TagBean.findByBookmarkId(b.id))
 
   def findForUser(userId: String, providerId: String): List[BookmarkBeanWithTags] = {
     DB.withConnection { implicit connection =>
@@ -50,13 +44,27 @@ object BookmarkBeanWithTags {
 			INNER JOIN user ON bookmark.user_id = user.id
 			WHERE user.user_id = {userId}
 			AND user.provider_id = {providerId}
-          """).on('userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple *).map { b =>
-        BookmarkBeanWithTags(b.id, b.title, b.date, b.description, b.userId, b.linkId, b.link, TagBean.findByBookmarkId(b.id))
-      }
+          """).on('userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple *) map addTagsToBookmark
     }
   }
 
+  def findByIdForUser(bookmarkId: Long, userId: String, providerId: String): BookmarkBeanWithTags = {
+    DB.withConnection { implicit connection =>
+      val b = SQL("""
+				  SELECT bookmark.id, bookmark.title, bookmark.date, bookmark.description, bookmark.user_id, bookmark.link_id, link.link
+				  FROM bookmark
+				  INNER JOIN link ON bookmark.link_id = link.id
+				  INNER JOIN user ON bookmark.user_id = user.id
+				  WHERE bookmark.id = {bookmarkId} 
+		          AND  user.user_id = {userId}
+				  AND user.provider_id = {providerId}
+				  """).on('bookmarkId -> bookmarkId, 'userId -> userId, 'providerId -> providerId).as(BookmarkBean.simple.singleOpt)
+      b match { case Some(x) => addTagsToBookmark(x) }
+    }
+
+  }
 }
+
 object BookmarkBean {
 
   implicit val bookmarkWrites = new Writes[BookmarkBean] {

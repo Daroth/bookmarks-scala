@@ -1,14 +1,20 @@
 @* links_list Template File *@
 @(param: Any)
 <div class="well">
-{{#each}}
-<div class="bookmark">
-	<h1><a href="{{link}}">{{title}}</a></h1>
-	<i>{{dateFormat date}}</i>
-	<div>{{description}}</div>
-	<strong>
-		{{#each tags}}<span class="tag">{{name}}</span>{{/each}}
-	</strong>
-</div>
-{{/each}}
+	<div class="bookmark" ng-repeat="bookmark in bookmarks | filter:filterLink">
+		<div>
+			<a href="#/bookmarks/{{bookmark.id}}" class="btn  btn-primary pull-right">
+				<i class="icon-edit icon-white"></i>
+				Edit
+			</a>
+		</div>
+		<h1><a href="{{bookmark.link}}">{{bookmark.title}}</a></h1>
+		<i>{{bookmark.date}}</i>
+		<div>{{bookmark.description}}</div>
+		<strong>
+			<span class="tag" ng-repeat="tag in bookmark.tags">
+				{{tag.name}}
+			</span>
+		</strong>
+	</div>
 </div>

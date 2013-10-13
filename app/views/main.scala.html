@@ -1,30 +1,31 @@
-@(title: String)(content: Html)
+@(title: String)(appName: String)(content: Html)
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en" ng-app="@appName">
     <head>
+		<meta charset="utf-8">
+
         <title>@title</title>
 
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-responsive.min.css")">
 
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-
         <script src="@routes.Assets.at("javascripts/moment.js")" type="text/javascript"></script>
+        
         <script src="@routes.Assets.at("javascripts/jquery.js")" type="text/javascript"></script>
+        
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/ember/handlebars.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/ember/ember.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/ember/ember-data.js")" type="text/javascript"></script>
 
-        <script src="@routes.Assets.at("javascripts/bookmarks/helpers.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/angular/angular.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/angular/angular-route.js")" type="text/javascript"></script>
+        
         <script src="@routes.Assets.at("javascripts/bookmarks/application.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/bookmarks/router.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/bookmarks/models/bookmark.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/bookmarks/models/tag.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/bookmarks/bookmarks_controller.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bookmarks/controllers.js")" type="text/javascript"></script>
+
     </head>
     <body>
         @content

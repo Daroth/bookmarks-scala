@@ -23,46 +23,46 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
       (__ \ 'tags).read[String] and
       (__ \ 'description).read[String] tupled)
 
-  def index = SecuredAction { implicit request =>
-
+  def index = Action { implicit request =>
     Ok(views.html.index())
   }
 
-  def tags = SecuredAction { request =>
-    val tagsList = TagBean.findForUser(request.user.id.id, request.user.id.providerId)
-    Ok(Json.toJson(tagsList map { tag => Json.obj(tag.name -> tag.weight) }))
+  def bookmarksList = Action { implicit request =>
+    Ok(views.html.bookmarks.bookmarks_list())
   }
 
-  def getBookmarks = SecuredAction { request =>
-    var bookmarksList = BookmarkBeanWithTags.findForUser(request.user.id.id, request.user.id.providerId)
-    var tagsList = TagBean.findDistinctForUser(request.user.id.id, request.user.id.providerId)
-    Ok(Json.obj("bookmarks" -> Json.toJson(bookmarksList), "tags" -> Json.toJson(tagsList)))
+  def bookmarksEdit = Action { implicit request =>
+    Ok(views.html.bookmarks.bookmarks_edit())
   }
 
-  def validateBookmark = SecuredAction { request =>
-    request.body.asJson.map { json =>
-      json.validate[(String, String, String, String)].map {
-        case (link, title, tags, description) => Ok(Json.obj("status" -> "OK"))
-      }.recoverTotal {
-        e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
-      }
-    }.getOrElse {
-      BadRequest("Expecting Json data")
-    }
+  //  def tags = Action { request =>
+  //    val tagsList = TagBean.findForUser(request.user.id.id, request.user.id.providerId)
+  //    Ok(Json.toJson(tagsList map { tag => Json.obj(tag.name -> tag.weight) }))
+  //  }
+
+  def getBookmarks = Action { request =>
+    //    var bookmarksList = BookmarkBeanWithTags.findForUser(request.user.id.id, request.user.id.providerId)
+    val bookmarksList = BookmarkBeanWithTags.findForUser("a@a.a", "userpass")
+    Ok(Json.toJson(bookmarksList))
   }
 
-  def saveBookmark = SecuredAction { request =>
-    request.body.asJson.map { json =>
-      json.validate[(String, String, String, String)].map {
-        case (link, title, tags, description) => {
-          BookmarkBean.save(link, title, tags, description, request.user)
-          Ok(Json.obj("status" -> "OK"))
-        }
-      }.recoverTotal {
-        e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
-      }
-    }.getOrElse {
-      BadRequest("Expecting Json data")
-    }
+  def getBookmark(bookmarkId: Long) = Action { request =>
+    val bookmarksList = BookmarkBeanWithTags.findByIdForUser(bookmarkId, "a@a.a", "userpass")
+    Ok(Json.toJson(bookmarksList))
   }
+
+  //  def saveBookmark = Action { request =>
+  //    request.body.asJson.map { json =>
+  //      json.validate[(String, String, String, String)].map {
+  //        case (link, title, tags, description) => {
+  //          BookmarkBean.save(link, title, tags, description, request.user)
+  //          Ok(Json.obj("status" -> "OK"))
+  //        }
+  //      }.recoverTotal {
+  //        e => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(e)))
+  //      }
+  //    }.getOrElse {
+  //      BadRequest("Expecting Json data")
+  //    }
+  //  }
 }
