@@ -13,15 +13,29 @@ bookmarksControllers.controller('BookmarksCtrl', [ '$scope', 'Bookmark', 'Tag',
 				$scope.newBookmark = undefined;
 			}
 			$scope.saveCreationForm = function() {
-				var bookmark = {
-					title : $scope.newBookmark.title,
-					description : $scope.newBookmark.description,
-					link : $scope.newBookmark.link,
-					tags : (function parseTags(tags) {
-						return tags.split(/\s*,\s*/);
-					})($scope.newBookmark.tags)
+				if ($scope.newBookmark) {
+					var bookmark = {
+						title : $scope.newBookmark.title,
+						description : $scope.newBookmark.description,
+						link : $scope.newBookmark.link,
+						tags : (function parseTags(tags) {
+							var ret;
+							if (tags) {
+								ret = tags.split(/\s*,\s*/)
+							} else {
+								ret = [];
+							}
+							return ret;
+						})($scope.newBookmark.tags)
+					}
+					Bookmark.create(bookmark, function createBookmarkSuccess() {
+						$scope.newBookmark = undefined;
+						$scope.bookmarks = Bookmark.all();
+						$scope.tags = Tag.all();
+					}, function createBookmarkFail() {
+						console.log("create bookmarks failed :", arguments);
+					});
 				}
-				Bookmark.create(bookmark);
 			}
 		} ]);
 
