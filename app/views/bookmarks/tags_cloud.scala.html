@@ -1,8 +1,8 @@
 @* tags_cloud Template File *@
 @(param: Any)
 
-@*
 <div class="well">
-
+	<span ng-repeat="tag in tags" class="tag" style="font-size: {{tag.size}}%;">
+		{{tag.name}}
+	</span>
 </div>
-*@

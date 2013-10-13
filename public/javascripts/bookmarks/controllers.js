@@ -7,6 +7,10 @@ bookmarksControllers.controller('BookmarksCtrl', function BookmarksCtrl($scope,
 	$http.get('bookmarks').success(function(data) {
 		$scope.bookmarks = data;
 	});
+
+	$http.get('tags').success(function(data) {
+		$scope.tags = TagsCloud.process(data);
+	});
 });
 
 bookmarksControllers.controller('BookmarkEditCtrl', function BookmarksCtrl(

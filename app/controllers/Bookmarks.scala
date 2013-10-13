@@ -23,6 +23,9 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
       (__ \ 'tags).read[String] and
       (__ \ 'description).read[String] tupled)
 
+  private def userId = "a@a.a" // request.user.id.id
+  private def providerId = "userpass" // request.user.id.providerId
+
   def index = Action { implicit request =>
     Ok(views.html.index())
   }
@@ -35,19 +38,19 @@ object Bookmarks extends Controller with securesocial.core.SecureSocial {
     Ok(views.html.bookmarks.bookmarks_edit())
   }
 
-  //  def tags = Action { request =>
-  //    val tagsList = TagBean.findForUser(request.user.id.id, request.user.id.providerId)
-  //    Ok(Json.toJson(tagsList map { tag => Json.obj(tag.name -> tag.weight) }))
-  //  }
+  def tags = Action { request =>
+    val tagsList = TagWeightBean.findForUser(userId, providerId)
+    Ok(Json.toJson(tagsList))
+  }
 
   def getBookmarks = Action { request =>
     //    var bookmarksList = BookmarkBeanWithTags.findForUser(request.user.id.id, request.user.id.providerId)
-    val bookmarksList = BookmarkBeanWithTags.findForUser("a@a.a", "userpass")
+    val bookmarksList = BookmarkBeanWithTags.findForUser(userId, providerId)
     Ok(Json.toJson(bookmarksList))
   }
 
   def getBookmark(bookmarkId: Long) = Action { request =>
-    val bookmarksList = BookmarkBeanWithTags.findByIdForUser(bookmarkId, "a@a.a", "userpass")
+    val bookmarksList = BookmarkBeanWithTags.findByIdForUser(bookmarkId, userId, providerId)
     Ok(Json.toJson(bookmarksList))
   }
 

@@ -7,7 +7,7 @@ GET    /                          controllers.Bookmarks.index
 GET    /partials/bookmarks-list   controllers.Bookmarks.bookmarksList
 GET    /partials/bookmark-edit    controllers.Bookmarks.bookmarksEdit
 
-# GET    /tags                     controllers.Bookmarks.tags
+GET    /tags                      controllers.Bookmarks.tags
 GET    /bookmarks                 controllers.Bookmarks.getBookmarks
 GET    /bookmarks/:bookmarkId     controllers.Bookmarks.getBookmark(bookmarkId: Long)
 # POST   /bookmarks                controllers.Bookmarks.saveBookmark
